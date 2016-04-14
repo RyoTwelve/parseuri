@@ -29,7 +29,7 @@ var parsed = parseuri('http://userid:passwo ond@login.bizarre.example.co.kr:8080
  * @returns {string}        Object.ip            The IP Address is given (conditional)
 
  * @returns {Object.<string,any>} Object.data          The url parameters parsed into an object.
- * @returns {Array.<string>}      Object.domains       The list of domain including the sub-, and top level domain.
+ * @returns {Array.<string>}      Object.domains       The list of domains inc. the sub-, and top level domain.
 
  * @returns {Object.<string,string>} Object.auth          The url authentication parameters.
  * @returns {string}                 Object.auth.username Authentication username.
