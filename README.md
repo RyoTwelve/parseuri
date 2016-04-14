@@ -47,4 +47,4 @@ Related Links
 -------------
 
 - [file-regex-weburl-js](https://gist.github.com/dperini/729294#file-regex-weburl-js)
-- [In search of the perfect URL validation regex](https://mathiasbynens.be/demo/url-regex/)
+- [In search of the perfect URL validation regex](https://mathiasbynens.be/demo/url-regex/) (see [tests.html]tests.html)

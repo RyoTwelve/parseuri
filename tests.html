@@ -10,27 +10,7 @@
 </head>
 <body>
 <script type="text/javascript">
-// Oh God.
-/* * {
- *    auth: {,
- *        username:  'userid',
- *        password: 'password'
- *    },
- *    host     : 'login.bizarre.example.co.kr',
- *    protocol : 'http',
- *    subdomain: 'login',
- *    domain   : 'bizarre.example.co',
- *    tld      : 'com',
- *    port     : 8080,
- *    path     : 'setup/login.php',
- *    query    : 'uid=13&mode=safe&ret=true,
- *    anchor   : 'LoginBox',
- *    data: {
- *        uid  : 13,
- *        mode : 'safe',
- *        ret  : true
- *    }
- * }*/
+
  var ext = function(a,c){
     var b,d = {};
     for (b in a) d[b] = a[b];
@@ -53,6 +33,9 @@ var base = {
     ip: undefined,
     port: undefined,
 };
+
+// Oh God.
+
 var map = {
     "http://foo.com/blah_blah" : ext(base, {
         protocol: 'http', 
@@ -419,47 +402,45 @@ var map = {
 };
 
 var badmap = [
-"http://",
-"http://.",
-"http://..",
-"http://../",
-"http://?",
-"http://??",
-"http://??/",
-"http://#",
-"http://##",
-"http://##/",
-"http://foo.bar?q=Spaces should be encoded",
-"//",
-"//a",
-"///a",
-"///",
-"http:///a",
-//"foo.com", The parser is using http:// as default protocol is not given, so we skip this test.
-"rdar://1234",
-"h://test",
-"http:// shouldfail.com",
-":// should fail",
-"http://foo.bar/foo(bar)baz quux",
-"ftps://foo.bar/",
-"http://-error-.invalid/",
-"http://a.b--c.de/",
-"http://-a.b.co",
-"http://a.b-.co",
-"http://0.0.0.0",
-"http://10.1.1.0",
-"http://10.1.1.255",
-"http://224.1.1.1",
-"http://1.1.1.1.1",
-"http://123.123.123",
-"http://3628126748",
-"http://.www.foo.bar/",
-"http://www.foo.bar./",
-"http://.www.foo.bar./",
-"http://10.1.1.1",
+    "http://",
+    "http://.",
+    "http://..",
+    "http://../",
+    "http://?",
+    "http://??",
+    "http://??/",
+    "http://#",
+    "http://##",
+    "http://##/",
+    "http://foo.bar?q=Spaces should be encoded",
+    "//",
+    "//a",
+    "///a",
+    "///",
+    "http:///a",
+    //"foo.com", The parser is using http:// as default protocol is not given, so we skip this test.
+    "rdar://1234",
+    "h://test",
+    "http:// shouldfail.com",
+    ":// should fail",
+    "http://foo.bar/foo(bar)baz quux",
+    "ftps://foo.bar/",
+    "http://-error-.invalid/",
+    "http://a.b--c.de/",
+    "http://-a.b.co",
+    "http://a.b-.co",
+    "http://0.0.0.0",
+    "http://10.1.1.0",
+    "http://10.1.1.255",
+    "http://224.1.1.1",
+    "http://1.1.1.1.1",
+    "http://123.123.123",
+    "http://3628126748",
+    "http://.www.foo.bar/",
+    "http://www.foo.bar./",
+    "http://.www.foo.bar./",
+    "http://10.1.1.1",
 ];
-
-
 
 QUnit.test('parseuri', function(assert){
     var n,i;
