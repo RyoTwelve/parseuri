@@ -37,6 +37,18 @@ var base = {
 // Oh God.
 
 var map = {
+    "http://google.com/?q=github" : ext(base, {
+        protocol: 'http', 
+        domain: 'google', 
+        tld: 'com', 
+        domains: ['google','com'], 
+        host: 'google.com', 
+        query: 'q=github', 
+        data: {
+            q: 'github'
+        },
+        uri: 'http://google.com/?q=github'}),
+
     "http://foo.com/blah_blah" : ext(base, {
         protocol: 'http', 
         domain: 'foo', 
