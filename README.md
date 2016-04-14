@@ -23,7 +23,7 @@ var parsed = parseuri('http://userid:passwo ond@login.bizarre.example.co.kr:8080
  * @returns {string}        Object.port          The port number (e.g. :8080).
  * @returns {string}        Object.subdomain     The highest level (followed by the protocol) domain.
  * @returns {string}        Object.domain        The full domain excluding the sub-, and the top level domain.
- * @returns {string}        Object.path          The path followed by the domain and port (e.g my/directory/index.html)
+ * @returns {string}        Object.path          The path followed by the domain and port (e.g my/dir/index.html)
  * @returns {string}        Object.query         The url parameters (e.g ?articleid=9374&tpl=std)
  * @returns {string}        Object.anchor        The url anchor (e.g #selected_area)
  * @returns {string}        Object.ip            The IP Address is given (conditional)
