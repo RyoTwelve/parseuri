@@ -73,9 +73,10 @@ var rURL = new RegExp(
 
 /**
  * @function parseuri
- * @version 0.1
+ * @version 1.0
  * @param {string} uri
- * @returns {Object} 
+ * @returns {Object.<string, any>|boolean} Returns false is URI is not valid.
+
  * @returns {string}        Object.uri           The full URI.
  * @returns {string}        Object.protocol      The protocol (e.g. http://, ftp://, ...).
  * @returns {string}        Object.tld           The top level domain (e.g. com, org, net, ...).
@@ -85,12 +86,14 @@ var rURL = new RegExp(
  * @returns {string}        Object.path          The path followed by the domain and port (e.g my/directory/index.html)
  * @returns {string}        Object.query         The url parameters (e.g ?articleid=9374&tpl=std)
  * @returns {string}        Object.anchor        The url anchor (e.g #selected_area)
+ * @returns {string}        Object.ip            The IP Address is given (conditional)
 
- * @returns {Object<string,any>} Object.data          The url parameters parsed into an object.
- * @returns {Array<string>}      Object.domains       The list of domain including the sub-, and top level domain.
- * @returns {Object}             Object.auth          The url authentication parameters.
- * @returns {Object}             Object.auth.username Authentication username.
- * @returns {Object}             Object.auth.password Authentication password.
+ * @returns {Object.<string,any>} Object.data          The url parameters parsed into an object.
+ * @returns {Array.<string>}      Object.domains       The list of domain including the sub-, and top level domain.
+
+ * @returns {Object.<string,string>} Object.auth          The url authentication parameters.
+ * @returns {string}                 Object.auth.username Authentication username.
+ * @returns {string}                 Object.auth.password Authentication password.
  *
  */
 var parseuri = function(uri) {  
