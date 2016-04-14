@@ -56,7 +56,7 @@ var rURL = new RegExp(
       // TLD identifier
       "((?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))" +
       // TLD may end with dot
-      "\\.?" +
+      //"\\.?" + // (rather not)
     "))" +
     // port number
     "(?::(\\d{2,5}))?" +
@@ -102,7 +102,7 @@ var parseuri = function(uri) {
     /** @type {Object} */       ud = {};
 
     // Clean URI
-    uri = uri.replace(rUriClr,'');
+    //uri = uri.replace(rUriClr,'');
 
     if ((m = !!/.*?:\/\//.exec(uri) ? uri.match(rURL) : ('http://'+uri).match(rURL))) {
         ud = {
@@ -111,20 +111,26 @@ var parseuri = function(uri) {
             'subdomain' : !!m[5] ? m[4] : '',
             'domain'    : ((!!m[5] ? m[5] : m[4]) || '').replace(/\./,''),
             'tld'       : !!m[6] ? m[6].replace(/./,'') : '',
-            'port'      : parseInt(m[7], 10) || '',
+            'port'      : isFinite(m[7]) ? parseInt(m[7], 10) : undefined,
             'host'      : m[3] || '',
             'path'      : m[8] || '',
             'query'     : m[9] || '',
             'anchor'    : m[10] || '',
             'data'      : {},
+            'ip'        : undefined,
             'auth'      : {
                 'username' : undefined,
                 'password' :undefined
             },
         };
 
-        ud['domains'] = [ud['subdomain']].concat(ud['domain'].split('.'), ud['tld']);
-        if (ud['domain'] === '') ud['ip'] = ud['host'];
+        ud['domains'] = ud['subdomain'] !== '' ? [ud['subdomain']] : [];
+        ud['domains'] = ud['domains'].concat(ud['domain'].split('.'), ud['tld']);
+
+        if (ud['domain'] === '') {
+            ud['ip'] = ud['host'];
+            ud['domains'] = [];
+        }
         if (typeof m[2] !== 'undefined' && ((m[2] = m[2].split(':')))) {
             ud['auth'] = {
                 'username': (m[2] ? m[2][0] : ''),
@@ -136,7 +142,7 @@ var parseuri = function(uri) {
             for (n=0,l=m[9].length;n<l;n++) {
                 v = m[9][n].split('=');
                 v[0] = v[0].replace(rTrim, '');
-                ud['data'][v[0]] = isFinite(v[1]) ? parseInt(v[1],10) : /false/i.exec(v[1]) ? false : /true/i.exec(v[1]) ? true : v[1];
+                ud['data'][v[0]] = v.length > 1 ? (isFinite(v[1]) ? parseInt(v[1],10) : /false/i.exec(v[1]) ? false : /true/i.exec(v[1]) ? true : v[1]) : true;
             }
         }
         return ud;

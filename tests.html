@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>parseuri</title>
+<link rel="stylesheet" href="tests/lib/qunit.css" type="text/css">
+<script type="text/javascript" src="tests/lib/qunit.js"></script>
+<script type="text/javascript" src="parseuri.js"></script>
+
+</head>
+<body>
+<script type="text/javascript">
+// Oh God.
+/* * {
+ *    auth: {,
+ *        username:  'userid',
+ *        password: 'password'
+ *    },
+ *    host     : 'login.bizarre.example.co.kr',
+ *    protocol : 'http',
+ *    subdomain: 'login',
+ *    domain   : 'bizarre.example.co',
+ *    tld      : 'com',
+ *    port     : 8080,
+ *    path     : 'setup/login.php',
+ *    query    : 'uid=13&mode=safe&ret=true,
+ *    anchor   : 'LoginBox',
+ *    data: {
+ *        uid  : 13,
+ *        mode : 'safe',
+ *        ret  : true
+ *    }
+ * }*/
+ var ext = function(a,c){
+    var b,d = {};
+    for (b in a) d[b] = a[b];
+    for (b in c) d[b] = c[b];
+    return d;
+ };
+var base = {
+    protocol: '',
+    domain:'',
+    subdomain:'',
+    tld:'',
+    auth:{
+        username:undefined,
+        password:undefined
+    },
+    path:'',
+    anchor: '',
+    data: {},
+    query: '',
+    ip: undefined,
+    port: undefined,
+};
+var map = {
+    "http://foo.com/blah_blah" : ext(base, {
+        protocol: 'http', 
+        domain: 'foo', 
+        tld: 'com', 
+        domains: ['foo','com'], 
+        host: 'foo.com', 
+        path:'blah_blah', 
+        uri: 'http://foo.com/blah_blah'}),
+
+    "http://foo.com/blah_blah/" : ext(base, {
+        protocol: 'http', 
+        domain: 'foo', 
+        tld: 'com', 
+        domains: ['foo','com'], 
+        host: 'foo.com', 
+        path:'blah_blah/', 
+        uri: 'http://foo.com/blah_blah/'}),
+
+    "http://foo.com/blah_blah_(wikipedia)" : ext(base, {
+        protocol: 'http', 
+        domain: 'foo', 
+        tld: 'com', 
+        domains: ['foo','com'], 
+        host: 'foo.com', 
+        path:'blah_blah_(wikipedia)', 
+        uri: 'http://foo.com/blah_blah_(wikipedia)'}),
+
+    "http://foo.com/blah_blah_(wikipedia)_(again)" : ext(base, {
+        protocol: 'http', 
+        domain: 'foo', 
+        tld: 'com', 
+        domains: ['foo','com'], 
+        host: 'foo.com', 
+        path:'blah_blah_(wikipedia)_(again)', 
+        uri: 'http://foo.com/blah_blah_(wikipedia)_(again)'}),
+
+    "http://www.example.com/wpstyle/?p=364" :  ext(base, {
+        protocol: 'http', 
+        subdomain: 'www', 
+        domain: 'example', 
+        tld: 'com', 
+        domains: ['www','example','com'], 
+        host: 'www.example.com', 
+        path:'wpstyle/',
+        query:'p=364',
+        data:{
+            p:364
+        }, 
+        uri: 'http://www.example.com/wpstyle/?p=364'}),
+
+    "https://www.example.com/foo/?bar=baz&inga=42&quux" : ext(base, {
+        protocol: 'https', 
+        subdomain: 'www', 
+        domain: 'example', 
+        tld: 'com', 
+        domains: ['www','example','com'], 
+        host: 'www.example.com', 
+        path:'foo/',
+        query:'bar=baz&inga=42&quux',
+        data:{
+            bar: 'baz',
+            inga: 42,
+            quux:true
+        }, 
+        uri: 'https://www.example.com/foo/?bar=baz&inga=42&quux'
+    }),
+
+    "http://✪df.ws/123" : ext(base, {
+        protocol: 'http', 
+        domain: '✪df', 
+        tld: 'ws', 
+        domains: ['✪df','ws'], 
+        host: '✪df.ws', 
+        path:'123', 
+        uri: 'http://✪df.ws/123'
+    }),
+
+    "http://userid:password@example.com:8080" : ext(base, {
+        protocol: 'http', 
+        auth:{
+            username : 'userid',
+            password : 'password'}, 
+        port: 8080, 
+        domain: 'example', 
+        tld: 'com', 
+        domains: ['example','com'], 
+        host: 'example.com', 
+        uri: 'http://userid:password@example.com:8080'}),
+
+    "http://userid:password@example.com:8080/" :  ext(base, {
+        protocol: 'http', 
+        auth: {
+            username:'userid',
+            password:'password'
+        }, 
+        port: 8080, 
+        domain: 'example', 
+        tld: 'com', 
+        domains: ['example','com'], 
+        host: 'example.com',
+        uri: 'http://userid:password@example.com:8080/'}),
+
+    "http://userid@example.com" : ext(base, {
+        protocol: 'http', 
+        auth:{
+            username:'userid',
+            password: undefined
+        }, 
+        domain: 'example', 
+        tld: 'com', 
+        domains: ['example','com'], 
+        host: 'example.com', 
+        uri: 'http://userid@example.com'}),
+
+    "http://userid@example.com/" : ext(base, {
+        protocol: 'http', 
+        auth:{
+            username:'userid',
+            password:undefined
+        }, 
+        domain: 'example', 
+        tld: 'com', 
+        domains: ['example','com'], 
+        host: 'example.com', 
+        uri: 'http://userid@example.com/'}),
+
+    "http://userid@example.com:8080" :  ext(base, {
+        protocol: 'http', port: 8080, 
+        auth:{
+            username: 'userid',
+            password: undefined
+        }, 
+        domain: 'example', 
+        tld: 'com', 
+        domains: ['example','com'], 
+        host: 'example.com', 
+        uri: 'http://userid@example.com:8080'}),
+
+    "http://userid@example.com:8080/" :  ext(base, {
+        protocol: 'http', port: 8080, 
+        auth:{
+            username: 'userid',
+            password: undefined
+        }, 
+        domain: 'example', 
+        tld: 'com', 
+        domains: ['example','com'], 
+        host: 'example.com', 
+        uri: 'http://userid@example.com:8080/'}),
+
+    "http://userid:password@example.com" :  ext(base, {
+        protocol: 'http',  
+        auth:{
+            username:'userid',
+            password:'password'
+        }, 
+        domain: 'example', 
+        tld: 'com', 
+        domains: ['example','com'], 
+        host: 'example.com', 
+        uri: 'http://userid:password@example.com'}),
+
+    "http://userid:password@example.com/" :  ext(base, {
+        protocol: 'http',  
+        auth:{
+            username:'userid',
+            password:'password'
+        }, 
+        domain: 'example', 
+        tld: 'com', 
+        domains: ['example','com'], 
+        host: 'example.com', 
+        uri: 'http://userid:password@example.com/'}),
+
+    "http://142.42.1.1/" :  ext(base, {
+        protocol: 'http',  
+        domains: [], 
+        host: '142.42.1.1', 
+        ip: '142.42.1.1', 
+        uri: 'http://142.42.1.1/'}),
+
+    "http://142.42.1.1:8080/" :  ext(base, {
+        protocol: 'http',  port: 8080, 
+        domains: [], 
+        host: '142.42.1.1', 
+        ip: '142.42.1.1', 
+        uri: 'http://142.42.1.1:8080/'}),
+
+    "http://➡.ws/䨹" :  ext(base, {
+        protocol: 'http',  
+        domain: '➡', 
+        tld: 'ws', 
+        domains: ['➡','ws'], 
+        host: '➡.ws', 
+        path:'䨹', 
+        uri: 'http://➡.ws/䨹'}),
+
+    "http://⌘.ws" :  ext(base, {
+        protocol: 'http',  
+        domain: '⌘', 
+        tld: 'ws', 
+        domains: ['⌘','ws'], 
+        host: '⌘.ws', 
+        uri: 'http://⌘.ws'}),
+
+    "http://⌘.ws/" :  ext(base, {
+        protocol: 'http',  
+        domain: '⌘', 
+        tld: 'ws', 
+        domains: ['⌘','ws'], 
+        host: '⌘.ws', 
+        uri: 'http://⌘.ws/'}),
+
+    "http://foo.com/blah_(wikipedia)#cite-1" :  ext(base, {
+        protocol: 'http',  
+        domain: 'foo', 
+        tld: 'com', 
+        domains: ['foo','com'], 
+        host: 'foo.com', 
+        path:'blah_(wikipedia)', 
+        anchor:'cite-1', 
+        uri: 'http://foo.com/blah_(wikipedia)#cite-1'}),
+
+    "http://foo.com/blah_(wikipedia)_blah#cite-1" :  ext(base, {
+        protocol: 'http',  
+        domain: 'foo', 
+        tld: 'com', 
+        domains: ['foo','com'], 
+        host: 'foo.com', 
+        path:'blah_(wikipedia)_blah', 
+        anchor:'cite-1', 
+        uri: 'http://foo.com/blah_(wikipedia)_blah#cite-1'}),
+
+    "http://foo.com/unicode_(✪)_in_parens" :  ext(base, {
+        protocol: 'http',  
+        domain: 'foo', 
+        tld: 'com', 
+        domains: ['foo','com'], 
+        host: 'foo.com', 
+        path:'unicode_(✪)_in_parens', 
+        uri: 'http://foo.com/unicode_(✪)_in_parens'}),
+
+    "http://foo.com/(something)?after=parens" :  ext(base, {
+        protocol: 'http',  
+        domain: 'foo', 
+        tld: 'com', 
+        domains: ['foo','com'], 
+        host: 'foo.com', 
+        path:'(something)',
+        query:'after=parens', 
+        data: {
+            after:'parens'
+        }, 
+        uri: 'http://foo.com/(something)?after=parens'}),
+
+    "http://☺.damowmow.com/" :  ext(base, {
+        protocol: 'http',  
+        subdomain: '☺',  
+        domain: 'damowmow', 
+        tld: 'com', 
+        domains: ['☺','damowmow', 'com'], 
+        host: '☺.damowmow.com', 
+        uri: 'http://☺.damowmow.com/'}),
+
+    "http://code.google.com/events/#&product=browser" :  ext(base, {
+        protocol: 'http',  
+        subdomain: 'code',  
+        domain: 'google', 
+        tld: 'com', 
+        domains: ['code','google', 'com'], 
+        host: 'code.google.com', 
+        path:'events/', 
+        anchor: '&product=browser', 
+        uri: 'http://code.google.com/events/#&product=browser'}),
+
+    "http://j.mp" :  ext(base, {
+        protocol: 'http', 
+        domain: 'j', 
+        tld: 'mp', 
+        domains: ['j', 'mp'], 
+        host: 'j.mp', 
+        uri: 'http://j.mp'}),
+
+    "ftp://foo.bar/baz" :  ext(base, {
+        protocol: 'ftp', 
+        domain: 'foo', 
+        tld: 'bar', 
+        domains: ['foo', 'bar'], 
+        host: 'foo.bar', 
+        path: 'baz', 
+        uri: 'ftp://foo.bar/baz'}),
+
+    "http://foo.bar/?q=Test%20URL-encoded%20stuff" :  ext(base, {
+        protocol: 'http', 
+        domain: 'foo', 
+        tld: 'bar', 
+        domains: ['foo', 'bar'], 
+        host: 'foo.bar', 
+        query: 'q=Test%20URL-encoded%20stuff', 
+        data:{
+            q:'Test%20URL-encoded%20stuff'
+        }, 
+        uri: 'http://foo.bar/?q=Test%20URL-encoded%20stuff'}),
+
+    "http://مثال.إختبار" :  ext(base, {
+        protocol: 'http', 
+        domain: 'مثال', 
+        tld: 'إختبار', 
+        domains: ['مثال', 'إختبار'], 
+        host: 'مثال.إختبار',  
+        uri: 'http://مثال.إختبار'}),
+
+    "http://例子.测试" :  ext(base, {
+        protocol: 'http', 
+        domain: '例子', 
+        tld: '测试', 
+        domains: ['例子', '测试'], 
+        host: '例子.测试',  
+        uri: 'http://例子.测试'}),
+
+    "http://उदाहरण.परीक्षा" :  ext(base, {
+        protocol: 'http', 
+        domain: 'उदाहरण', 
+        tld: 'परीक्षा', 
+        domains: ['उदाहरण', 'परीक्षा'], 
+        host: 'उदाहरण.परीक्षा',  
+        uri: 'http://उदाहरण.परीक्षा'}),
+
+    "http://-.~_!$&'()*+,;=:%40:80%2f::::::@example.com" :  ext(base, {
+        protocol: 'http', 
+        auth:{username:"-.~_!$&'()*+,;=", password:'%40'}, 
+        domain: 'example', 
+        tld: 'com', 
+        domains: ['example', 'com'], 
+        host: 'example.com',  
+        uri: "http://-.~_!$&'()*+,;=:%40:80%2f::::::@example.com"}),
+
+
+    "http://1337.net" :  ext(base, {
+        protocol: 'http', 
+        domain: '1337', 
+        tld: 'net', 
+        domains: ['1337', 'net'], 
+        host: '1337.net',  
+        uri: 'http://1337.net'}),
+
+    "http://a.b-c.de" :  ext(base, {
+        protocol: 'http',
+        subdomain:'a', 
+        domain: 'b-c', 
+        tld: 'de', 
+        domains: ['a','b-c', 'de'], 
+        host: 'a.b-c.de',  
+        uri: 'http://a.b-c.de'}),
+
+    "http://223.255.255.254" :  ext(base, {
+        protocol: 'http', 
+        domains: [], 
+        host: '223.255.255.254', 
+        ip: '223.255.255.254',
+        uri: 'http://223.255.255.254'}),
+
+};
+
+var badmap = [
+"http://",
+"http://.",
+"http://..",
+"http://../",
+"http://?",
+"http://??",
+"http://??/",
+"http://#",
+"http://##",
+"http://##/",
+"http://foo.bar?q=Spaces should be encoded",
+"//",
+"//a",
+"///a",
+"///",
+"http:///a",
+//"foo.com", The parser is using http:// as default protocol is not given, so we skip this test.
+"rdar://1234",
+"h://test",
+"http:// shouldfail.com",
+":// should fail",
+"http://foo.bar/foo(bar)baz quux",
+"ftps://foo.bar/",
+"http://-error-.invalid/",
+"http://a.b--c.de/",
+"http://-a.b.co",
+"http://a.b-.co",
+"http://0.0.0.0",
+"http://10.1.1.0",
+"http://10.1.1.255",
+"http://224.1.1.1",
+"http://1.1.1.1.1",
+"http://123.123.123",
+"http://3628126748",
+"http://.www.foo.bar/",
+"http://www.foo.bar./",
+"http://.www.foo.bar./",
+"http://10.1.1.1",
+];
+
+
+
+QUnit.test('parseuri', function(assert){
+    var n,i;
+    for (n in map) {
+        assert.deepEqual(parseuri(n), map[n], 'Match and parsed well:' + n);
+    }
+    for (i=0,n=badmap.length;i<n;i++) {
+        assert.notOk(parseuri(badmap[i]), 'Shouldn\'t match and cannot be parsed:' + badmap[i]);
+    }
+});
+
+</script>
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+
+</body></html>
