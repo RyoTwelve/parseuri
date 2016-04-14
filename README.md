@@ -9,8 +9,8 @@ var parsed = parseurl('http://userid:password@login.bizarre.example.co.kr:8080/s
  * {
  *    auth: {,
  *        username:  'userid',
- *        password: 'password',
- *    }
+ *        password: 'password'
+ *    },
  *    host     : 'login.bizarre.example.co.kr',
  *    protocol : 'http',
  *    subdomain: 'login',
@@ -20,10 +20,10 @@ var parsed = parseurl('http://userid:password@login.bizarre.example.co.kr:8080/s
  *    path     : 'setup/login.php',
  *    query    : 'uid=13&mode=safe&ret=true,
  *    anchor   : 'LoginBox',
- *    data: {,
+ *    data: {
  *        uid  : 13,
  *        mode : 'safe',
- *        ret  : true,
+ *        ret  : true
  *    }
  * }
  */
