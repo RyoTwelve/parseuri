@@ -72,7 +72,7 @@ var rURL = new RegExp(
 /** @type {RegExp} */ var rTrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/;
 
 /**
- * @function parseurl
+ * @function parseuri
  * @version 0.1
  * @param {string} uri
  * @returns {Object} 
