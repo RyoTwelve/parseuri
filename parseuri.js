@@ -93,7 +93,7 @@ var rURL = new RegExp(
  * @returns {Object}             Object.auth.password Authentication password.
  *
  */
-var parseurl = function(uri) {  
+var parseuri = function(uri) {  
     var 
     /** @type {Object} */       m,
     /** @type {number} */       n,
