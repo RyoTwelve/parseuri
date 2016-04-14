@@ -6,7 +6,7 @@ Validation and testing based on [https://mathiasbynens.be/demo/url-regex/](https
 
 ### Usage
 ```
-var parsed = parseuri('http://userid:passwo ond@login.bizarre.example.co.kr:8080/setup/login.php?uid=13&mode=safe&ret=true#LoginBox');
+var parsed = parseuri('http://usr:pass@login.biz.example.co.kr:8080/usr/login.php?uid=13&ret=true#LoginBox');
 ```
 
 ### Documentation
