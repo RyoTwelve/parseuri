@@ -11,6 +11,7 @@ var parsed = parseuri('http://usr:pass@login.biz.example.co.kr:8080/usr/login.ph
 
 ### Documentation
 ```
+
 /**
  * @function parseuri
  * @version 1.0
@@ -35,7 +36,6 @@ var parsed = parseuri('http://usr:pass@login.biz.example.co.kr:8080/usr/login.ph
  * @returns {Object.<string,string>} Object.auth          The url authentication parameters.
  * @returns {string}                 Object.auth.username Authentication username.
  * @returns {string}                 Object.auth.password Authentication password.
- *
  */
 ```
 
